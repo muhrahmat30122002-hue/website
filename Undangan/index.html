@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSVP Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #fbf3e3; padding: 20px; }
+        form { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        label { display: block; margin-bottom: 5px; }
+        input, select, button { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        #results { margin-top: 20px; padding: 20px; background: #e8f5e8; border-radius: 8px; }
+        .rsvp-item { margin-bottom: 15px; padding: 10px; background: white; border-radius: 4px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        #totalGuests { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h2>RSVP - Konfirmasi Kehadiran</h2>
+    <form id="rsvpForm">
+        <label for="name">Nama:</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="attendance">Apakah Anda akan hadir?</label>
+        <select id="attendance" name="attendance" required>
+            <option value="">Pilih</option>
+            <option value="Ya">Ya, saya akan hadir</option>
+            <option value="Tidak">Tidak, saya tidak bisa hadir</option>
+            <option value="Mungkin">Mungkin</option>
+        </select>
+        
+        <label for="guests">Jumlah tamu yang hadir:</label>
+        <input type="number" id="guests" name="guests" min="0" value="0">
+        
+        <label for="message">Pesan tambahan (ucapan):</label>
+        <input type="text" id="message" name="message">
+        
+        <button type="submit">Kirim RSVP</button>
+    </form>
+    
+    <div id="results">
+        <h3>Daftar RSVP Terbaru:</h3>
+        <div id="totalGuests">Total tamu yang hadir: 0</div>
+        <div id="rsvpList"></div>
+    </div>
+
+    <script>
+        let rsvpData = []; // Array untuk menyimpan data RSVP
+        let totalGuests = 0; // Variabel untuk total tamu yang hadir
+
+        document.getElementById('rsvpForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah pengiriman formulir ke server
+            
+            // Ambil nilai dari kolom
+            const name = document.getElementById('name').value;
+            const attendance = document.getElementById('attendance').value;
+            const guests = parseInt(document.getElementById('guests').value) || 0;
+            const message = document.getElementById('message').value;
+            
+            // Tambahkan data ke array
+            rsvpData.push({ name, attendance, guests, message });
+            
+            // Perbarui total tamu hanya jika konfirmasi hadir
+            if (attendance === 'Ya') {
+                totalGuests += guests;
+            }
+            
+            // Perbarui tampilan daftar dan total
+            updateResults();
+            
+            // Reset formulir setelah submit
+            this.reset();
+        });
+
+        function updateResults() {
+            // Perbarui total tamu
+            document.getElementById('totalGuests').textContent = `Total tamu yang hadir: ${totalGuests}`;
+            
+            const list = document.getElementById('rsvpList');
+            list.innerHTML = ''; // Kosongkan daftar sebelumnya
+            
+            // Tampilkan semua data dari array (terbaru di atas)
+            rsvpData.slice().reverse().forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'rsvp-item';
+                itemDiv.innerHTML = `
+                    <p><strong>Nama:</strong> ${item.name}</p>
+                    <p><strong>Kehadiran:</strong> ${item.attendance}</p>
+                    <p><strong>Jumlah tamu yang hadir:</strong> ${item.guests}</p>
+                    <p><strong>Ucapan:</strong> ${item.message}</p>
+                `;
+                list.appendChild(itemDiv);
+            });
+        }
+    </script>
+</body>
+</html>
